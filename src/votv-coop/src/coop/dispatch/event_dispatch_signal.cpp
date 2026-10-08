@@ -23,6 +23,7 @@
 #include "coop/interactables/meadow_db_sync.h"   // MeadowAppend/MeadowDelete
 #include "coop/interactables/physmods_sync.h"    // PhysModsState
 #include "coop/interactables/sat_console_sync.h"  // SatConsole
+#include "coop/interactables/tv_sync.h"           // TvPlayEvent
 #include "coop/interactables/drive_payload_sync.h"  // DrivePayload
 #include "coop/interactables/drive_sync.h"       // DriveSlotState
 #include "coop/interactables/drive_rack_sync.h"  // RackState
@@ -109,6 +110,23 @@ bool HandleSignalEvent(net::Session& /*session*/,
                 ? static_cast<uint8_t>(msg.senderPeerSlot)
                 : static_cast<uint8_t>(0xFF);
         coop::deck_play_sync::OnPlayDeck(pd, pdslot);
+        break;
+    }
+    case net::ReliableKind::TvPlayEvent: {
+        // A television playback edge (presser-authored; host relays; the role, rate and generation
+        // gates live in tv_sync::OnTvPlay).
+        if (msg.payloadLen < sizeof(net::TvPlayEventPayload)) {
+            UE_LOGW("event_feed: TvPlayEvent payload too short (%zu < %zu)",
+                    static_cast<size_t>(msg.payloadLen), sizeof(net::TvPlayEventPayload));
+            break;
+        }
+        net::TvPlayEventPayload tp{};
+        std::memcpy(&tp, msg.payload, sizeof(tp));
+        const uint8_t tpslot =
+            (msg.senderPeerSlot >= 0 && msg.senderPeerSlot < net::kMaxPeers)
+                ? static_cast<uint8_t>(msg.senderPeerSlot)
+                : static_cast<uint8_t>(0xFF);
+        coop::tv_sync::OnTvPlay(tp, tpslot);
         break;
     }
     case net::ReliableKind::PhysModsState: {

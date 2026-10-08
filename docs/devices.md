@@ -442,6 +442,7 @@ removed from its author's hand -- and a joiner gets every box's count at its wor
 | an order | the client names the row; the host performs and prices | an intent |
 | a coin gun sale | the client names the prop; the host prices, mints and destroys | an intent ahead of the destroy |
 | a device's floppy slot | the host | a 1 Hz digest-gated poll; a peer claims the outcome of its own insert or eject, and the host's canonical is the answer |
+| a television's playback | the presser, relayed | the deck's shape: the edge a peer's own organic media action produced plays on every peer's copy of that TV, a per-TV generation guard drops a stale stop, and an open whose file a peer does not hold fails there natively (the game's own toast) |
 
 ## Wire messages
 
@@ -465,6 +466,7 @@ removed from its author's hand -- and a joiner gets every box's count at its wor
 | `OrderQueue` | the host to all | a change to the delivery queue: a reset, an order queued (its items by row or by class), the first one taken off |
 | `CoinGunSell`, `CoinGunResult`, `CoinCollect` | a client to the host; the host to one client; a client to the host | the sold prop's key; the outcome; a coin the client tripped |
 | `FloppySlotState` | a peer to the host with a claim; the host to all with the canonical | one device's slot, or a set of them -- the server boxes' and the laptop's: the type, the writes, the rows and the save JSON, and the laptop's generation |
+| `TvPlayEvent` | any peer, relayed | one television playback edge: the TV's save Key, the verb (open / play / pause / stop), the author's playback generation, and the open's media reference -- a file's own name, each peer re-anchoring it on its own Assets\tv, or a URL whole |
 
 ## Late join
 
@@ -502,6 +504,7 @@ an error line.
 | The coin collect has two entries; the interceptor sits on the overlap entry, and the E-press entry dispatches inside the Blueprint where it cannot fire, so a coin a client collects by pressing is credited on the client only and the host's next balance broadcast erases it | `[V]` `coop/items/coingun_sync` |
 | A client's earnings from anything but the drone and the coin gun (a point sack, a chest, an achievement) reach only its own machine and are erased by the host's next broadcast | `[V]` `coop/world/balance_sync` is one-way |
 | A client's light-group index has been reported dropping to zero after a join; not reproduced | `[?]` [issue 11](https://github.com/VOTV-MP/Multivoid/issues/11) |
+| A joiner's televisions stay dark until the next playback edge: the lane replays nothing at the ready edge yet, and the last-open replay is the written next step. The video file is local, so a peer without the file also misses the picture, and a media reference longer than 185 UTF-8 bytes is cut on the author and cannot match a peer's file |
 | A slot change reaches the other peer on the next poll, so up to a second plus the round trip. A player who reaches a box inside that window acts on the slot as it was: an eject of a disc the other peer has just inserted answers "No floppy disc in the slot" and is not retried, and a client's insert into a slot the host has just filled replaces the host's disc when the claim lands, which loses that disc | `[V]` the lane polls at 1 Hz, and the host applies a claim over whatever its slot holds (`coop/interactables/floppy_slot_sync`); a faster poll would narrow the window rather than close it |
 
 ## Code map
@@ -514,6 +517,7 @@ an error line.
 | the coordinate towers | `coop/world/coord_tower_rows`, `coop/world/coord_tower_ops`, `ue_wrap/desk/coord_tower` |
 | the drone | `coop/interactables/drone_sync`, `coop/interactables/drone_call_intent`, `ue_wrap/devices/drone`, `ue_wrap/devices/drone_console` |
 | the floppy slot | `coop/interactables/floppy_slot_sync`, `ue_wrap/devices/floppy_slot`, `ue_wrap/devices/serverbox`, `ue_wrap/devices/laptop` |
+| the televisions | `coop/interactables/tv_sync`, `ue_wrap/devices/tv` |
 | the inbox | `coop/world/email_sync`, `ue_wrap/world/email`, `coop/session/join_seed` |
 | the economy | `coop/world/balance_sync`, `coop/items/order_sync`, `coop/items/coingun_sync`, `coop/interactables/upgrade_sync`, `ue_wrap/world/economy`, `ue_wrap/world/order_economy`, `ue_wrap/world/store_catalog`, `ue_wrap/world/upgrades` |
 | identity | `coop/element/portable_identity` |

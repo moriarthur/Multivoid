@@ -131,6 +131,9 @@ inline Lane LaneForKind(ReliableKind k) {
     // PlayDeckEvent is order-coupled with DeskInput and with SavedSignalAppend (a play must land
     // after its row's append); pinned.
     case ReliableKind::PlayDeckEvent:  return Lane::Normal;
+    // TvPlayEvent is ordered against nothing: an edge for a TV whose mirror has not bound waits for
+    // the key resolve, and an edge names what it acts on by generation. The default, by decision.
+    case ReliableKind::TvPlayEvent:    return Lane::Normal;
     // PhysModsState's ops, canonical and deny assume in-lane order (an op must not overtake the
     // canonical it was diffed against); pinned. Not relayable: ops are host-terminal, and the
     // canonical is host-authored.
@@ -247,6 +250,7 @@ inline bool IsClientRelayableReliableKind(ReliableKind k) {
     case ReliableKind::DeskScanEvent:     // presser-authored; every mirror replays the visual
     case ReliableKind::DeskSndFx:         // presser-authored
     case ReliableKind::PlayDeckEvent:     // presser-authored; any peer may stop
+    case ReliableKind::TvPlayEvent:       // presser-authored; every peer's copy of that TV plays the edge
     case ReliableKind::DishAimState:      // claim-owner-authoritative
     // KeypadState is not relayable: the host authors it, and a client's own keypad entries reach the
     // host as KeypadIntent. Nor are DrivePayload (the host authors a drive's row; a client's own rows go

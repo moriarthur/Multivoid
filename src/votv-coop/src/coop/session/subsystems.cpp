@@ -112,6 +112,8 @@
 #include "coop/items/broom_stroke.h"
 #include "coop/props/pack_trash_intent.h"
 #include "coop/interactables/verb_lanes.h"  // the interactable lanes on a device's own verbs, at the script gate
+#include "coop/interactables/tv_sync.h"  // television playback mirror (native MediaPlayer seams)
+#include "coop/game/custom_content.h"  // the game's Custom content gate, answered on for the session
 #include "coop/creatures/kerfus_lanes.h"  // the plain kerfur: its brain on the host, its state and drive, its verbs
 #include "coop/creatures/served_player.h"  // a robot the host runs for a client reads that client as its player
 #include "coop/items/broom_push.h"
@@ -240,6 +242,8 @@ void Install(coop::net::Session& session) {
     coop::desk_input_sync::Install(&session);  // the claim-free field-granular desk input lane
     coop::desk_snd_fx::Install(&session);  // desk audio-effect mirror (Func-patch audio seam)
     coop::deck_play_sync::Install(&session);  // deck playback edge mirror (audio-seam Activate/Deactivate + gen guard)
+    coop::tv_sync::Install(&session);  // television playback mirror (native MediaPlayer seams + per-TV gen guard)
+    coop::custom_content::Install(&session);  // the Custom content gate answered on while the session runs
     coop::physmods_sync::Install(&session);  // physMods slot ops at the desk's verbs + host-canonical array
     coop::drive_sync::Install(&session);  // the drive chain's slot lane (verb dirty-marks + the slot sweep; the slot and rack verb watches)
     coop::drive_payload_sync::Install(&session);  // a drive's row: the host authors it at prop_drive_C::upd
@@ -560,6 +564,8 @@ DisconnectStats DisconnectAll() {
     coop::desk_input_sync::OnDisconnect();
     coop::desk_snd_fx::OnDisconnect();
     coop::deck_play_sync::OnDisconnect();  // gen counters + ring + self-test latch
+    coop::tv_sync::OnDisconnect();  // gen tables + ring + evidence counters
+    coop::custom_content::OnDisconnect();  // the forced-answer tally
     coop::physmods_sync::OnDisconnect();  // verb snapshots + parked canonical + deny records
     coop::drive_sync::OnDisconnect();  // slot baselines + latch/dirty state + pending
     coop::drive_payload_sync::OnDisconnect();  // held and sent rows, parked rows, notes
@@ -673,6 +679,8 @@ void TickGameplay(coop::net::Session& session, bool isConnected, bool isHost,
     { PP::Scope _s{PP::Bucket::Interactable}; ue_wrap::ScopedWalkTimer _w{"sync:desk_input"}; coop::desk_input_sync::Tick(); }  // 250ms input-field poll -> claim-free DeskInput deltas + cooldown charge/scan classification
     { PP::Scope _s{PP::Bucket::Interactable}; ue_wrap::ScopedWalkTimer _w{"sync:desk_snd"}; coop::desk_snd_fx::Tick(); }  // audio-seam ring flush + lazy hook install + pending loop retry
     { PP::Scope _s{PP::Bucket::Interactable}; ue_wrap::ScopedWalkTimer _w{"sync:deck_play"}; coop::deck_play_sync::Tick(); }  // deck playback ring flush + lazy Deactivate/fin seam install + gen author
+    { PP::Scope _s{PP::Bucket::Interactable}; ue_wrap::ScopedWalkTimer _w{"sync:tv_play"}; coop::tv_sync::Tick(); }  // TV playback ring flush + lazy MediaPlayer seam install
+    { PP::Scope _s{PP::Bucket::Interactable}; coop::custom_content::Tick(); }  // settle the Custom content gate watch
     { PP::Scope _s{PP::Bucket::Interactable}; ue_wrap::ScopedWalkTimer _w{"sync:physmods"}; coop::physmods_sync::Tick(); }  // parked-canonical apply at desk resolve
     { PP::Scope _s{PP::Bucket::Interactable}; ue_wrap::ScopedWalkTimer _w{"sync:drive"}; coop::drive_sync::Tick(); coop::drive_payload_sync::Tick(); }  // the slot lane's drain and sweep; the rows' enrolments and parked retries
     { PP::Scope _s{PP::Bucket::Interactable}; ue_wrap::ScopedWalkTimer _w{"sync:drive_rack"}; coop::drive_rack_sync::Tick(); }  // rack barrier drain + 1 Hz sweep

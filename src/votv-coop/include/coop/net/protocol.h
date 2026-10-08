@@ -30,7 +30,7 @@ inline constexpr uint32_t kMagic = 0x564D5450u;
 // This file is past the 1500-line hard cap and stays there: it is the single-feature exception the
 // rule names. One wire format, whose enum, payload structs and static_asserts are read together;
 // splitting it would put a kind's number in one file and its bytes in another.
-inline constexpr uint16_t kProtocolVersion = 217;
+inline constexpr uint16_t kProtocolVersion = 218;
 
 // Default LAN port (overridable via multivoid.ini "net.port=").
 inline constexpr uint16_t kDefaultPort = 47621;
@@ -973,6 +973,16 @@ enum class ReliableKind : uint8_t {
     // read, the first five effect entries and the effect total. Never relayed. Late join: none. Trust: as
     // StatOrderReply. StatQueryReplyPayload.
     StatQueryReply = 172,
+
+    // Host to all: one television playback edge -- an open (a file path or a URL), a play, a pause or a
+    // stop on one of the base's TVs, authored by the host's own organic media edge or performed for a
+    // client's intent. Client to host: the same edge as an intent, run by the host and answered by its
+    // broadcast. Never relayed (a client's edge reaches the host alone; the host authors the canonical).
+    // Late join: the host replays each TV's latest open to a world-ready joiner. Trust: a client applies
+    // an edge only from the host (slot 0); the host takes an intent only from an admitted slot, rate
+    // bounded. The receiver drives the same native MediaPlayer verb on its own copy of the TV, so the
+    // game's own media pipeline repaints screen and sound. TvPlayEventPayload.
+    TvPlayEvent = 173,
 };
 
 #pragma pack(push, 1)
@@ -2769,6 +2779,33 @@ static_assert(sizeof(ChatLinePayload) <= 256 - 20 - 8,
               "ChatLinePayload must fit in one reliable datagram");
 
 inline constexpr uint8_t kChatLineFlagSeed = 0x01;
+
+// One television playback edge (TvPlayEvent). The host authors it -- its own organic media edge on one
+// of the base's TVs, or one it performed for a client's intent -- and every peer drives the same native
+// MediaPlayer verb on its own copy of that TV, under the lane's wire-apply guard, so the game's own
+// media pipeline repaints the screen and the sound. The media reference rides the open: a client whose
+// Assets\tv holds no such file fails the open natively (the game's own 'Video error' toast) and loses
+// nothing else. src is the open argument truncated to the cap; a name longer than the cap could not
+// resolve on a peer that would have to hold the same name anyway, and the truncation is said on the
+// author once.
+struct TvPlayEventPayload {
+    uint8_t  op;        // 1 -- TvPlayOp
+    uint8_t  flags;     // 1 -- kTvPlay*
+    uint8_t  _pad[2];   // 2 -- zeroed
+    WireKey  tvKey;     // 32 -- the television's save key (its Key FName text)
+    uint32_t gen;       // 4 -- the author's playback generation (mints on open; edges act on it)
+    uint16_t srcLen;    // 2 -- bytes used in src[]; 0 for play/pause/stop
+    char     src[186];  // 186 -- the open argument (a file path or a URL), UTF-8, NUL-free
+};
+static_assert(sizeof(TvPlayEventPayload) == 228, "TvPlayEventPayload must be 228 bytes");
+static_assert(sizeof(TvPlayEventPayload) <= 256 - 20 - 8,
+              "TvPlayEventPayload must fit in one reliable datagram");
+
+inline constexpr uint8_t kTvPlayOpen = 0;    // open src and play (flags bit 0: src is a URL, not a file)
+inline constexpr uint8_t kTvPlayStop = 1;    // Close() the TV's media player
+inline constexpr uint8_t kTvPlayResume = 2;  // Play()
+inline constexpr uint8_t kTvPlayPause = 3;   // Pause()
+inline constexpr uint8_t kTvPlayIsUrl = 1u << 0;
 
 // One turbine's driver state (TurbineState): the six inputs of the turbine's own spring and
 // integrator; the receiver writes them raw and the turbine's tick does the rest.

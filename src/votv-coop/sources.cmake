@@ -78,6 +78,7 @@ set(VOTVCOOP_SOURCES
     src/ue_wrap/devices/lightswitch.cpp
     src/ue_wrap/devices/garage.cpp
     src/ue_wrap/devices/appliance.cpp
+    src/ue_wrap/devices/tv.cpp
     src/ue_wrap/devices/power_control.cpp
     src/ue_wrap/devices/generator.cpp
     src/ue_wrap/devices/generator_panel.cpp
@@ -416,6 +417,7 @@ set(VOTVCOOP_SOURCES
     src/coop/interactables/desk_cursor_sync.cpp
     src/coop/interactables/desk_input_sync.cpp
     src/coop/interactables/deck_play_sync.cpp
+    src/coop/interactables/tv_sync.cpp
     src/coop/interactables/physmods_sync.cpp
     src/coop/interactables/drive_payload_sync.cpp
     src/coop/interactables/drive_sync.cpp
@@ -428,6 +430,7 @@ set(VOTVCOOP_SOURCES
     src/coop/interactables/desk_verb_intent.cpp
     src/coop/interactables/desk_verb_effects.cpp
     src/coop/interactables/toggle_verbs.cpp
+    src/coop/game/custom_content.cpp
     src/coop/interactables/drive_rack_sync.cpp
     src/coop/interactables/desk_snd_fx.cpp
     src/coop/interactables/desk_ping_sync.cpp
