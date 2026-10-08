@@ -13,6 +13,7 @@
 #include "ue_wrap/core/log.h"
 #include "ue_wrap/core/reflection.h"
 #include "ue_wrap/core/reflection_props.h"
+#include "ue_wrap/core/sdk_profile.h"
 #include "ue_wrap/core/ufunction_hook.h"
 #include "ue_wrap/devices/tv.h"
 
