@@ -240,5 +240,17 @@ CFG_FLAG(voice_test_tone, "voice.test_tone", "voice", false, "VOTVCOOP_VOICE_TES
 CFG_FLAG(voice_loopback, "voice.loopback", "voice", false, "VOTVCOOP_VOICE_LOOPBACK",
     "Dev: play your own transmitted voice back locally.")
 
+// The [game] section: compat shims for game systems a co-op session's flow skips, and the
+// device lanes' product switches.
+CFG_FLAG(game_custom_content, "game.custom_content", "game", true, "VOTVCOOP_GAME_CUSTOM_CONTENT",
+    "Force-enable the game's Custom content setting for this peer while a session runs. The vanilla "
+    "toggle appears only after the tutorial, which a co-op session skips, so without this the TV's "
+    "local video list plays nothing (the game's own 'Custom Content is disabled!' toast). Covers the "
+    "other gated custom content too: posters, rugs, flags, the 3D printer's Assets models.")
+CFG_FLAG(game_tv_sync, "game.tv_sync", "game", true, "VOTVCOOP_GAME_TV_SYNC",
+    "Television playback sync: an open, play, pause or stop on any TV drives every peer's copy of "
+    "that TV. Video files are local, so a peer whose Assets\\tv holds no file of that name fails the "
+    "open natively (the game's own 'Video error' toast) and everything else keeps working.")
+
 // The [dev] section, its own file: it grows with every drill, and the rows above are the product's.
 #include "coop/config/config_registry_rows_dev.inc"
